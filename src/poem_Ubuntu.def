@@ -12,7 +12,7 @@ Stage: build
         csh                             \
         build-essential                 \
         openmpi-common libopenmpi-dev   \
-        libnetcdf-dev                   \
+        libnetcdf-dev  libnetcdff-dev   \
         libhdf5-dev libhdf5-mpi-dev     \
         python3 python3-pip             \
         git                             \

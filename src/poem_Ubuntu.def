@@ -1,0 +1,53 @@
+Bootstrap: docker
+From: ubuntu:24.04
+Stage: build
+
+%post
+    
+    ARCH=$(uname -m)    
+    echo "Detected architecture: $ARCH"
+
+    apt-get update
+    apt-get install -y                  \
+        csh                             \
+        build-essential                 \
+        openmpi-common libopenmpi-dev   \
+        libnetcdf-dev                   \
+        libhdf5-dev libhdf5-mpi-dev     \
+        python3 python3-pip             \
+        git                             \
+        libudunits2-dev                 \
+        libjson-c-dev                   \
+        openssl libssl-dev              \
+        curl libcurl4-openssl-dev       \
+        libexpat1-dev                   \
+        ncview nco cdo                  
+
+    # The `which` binary works differently in Ubuntu
+    # This tool is important in configuration
+    apt-get install -y gnu-which
+    apt-get install -y vim emacs 
+
+    # Make POEM directory
+    mkdir /POEM_UNI
+    mkdir /POEM_UNI/bashrc.d
+
+%environment
+
+    export POEM_UNI=/POEM_UNI
+    export POEM=${POEM_UNI}/poem
+    export LC_ALL=C
+
+    if [ -d ${POEM_UNI}/bashrc.d ]; then
+        for f in ${POEM_UNI}/bashrc.d/*.sh; do
+            if [ -r $f ]; then
+                echo "Sourcing file: $f"
+                source $f
+            fi
+        done
+        unset f
+    fi
+
+
+%runscript
+    echo "RUNSCRIPT MODE"

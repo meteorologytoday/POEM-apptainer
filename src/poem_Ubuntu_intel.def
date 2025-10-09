@@ -1,0 +1,37 @@
+Bootstrap: docker
+From:  ubuntu:24.04
+Stage: build
+
+%post
+    
+    apt update
+    apt install -y build-essential python3 git gnu-which vim
+
+    echo "Installing spack for package management in HPC environment"
+    git clone --depth=2 https://github.com/spack/spack.git /spack
+    
+    # Make POEM directory
+    mkdir /POEM_UNI
+    mkdir /POEM_UNI/bashrc.d
+   
+%environment
+
+    export SPACK_ROOT=/spack
+    export POEM_UNI=/POEM_UNI
+    export POEM=${POEM_UNI}/poem
+    export LC_ALL=C
+    export SPACKENV="$SPACK_ROOT/share/spack/setup-env.sh"
+
+    if [ -d ${POEM_UNI}/bashrc.d ]; then
+        for f in ${POEM_UNI}/bashrc.d/*.sh; do
+            if [ -r $f ]; then
+                echo "Sourcing file: $f"
+                source $f
+            fi
+        done
+        unset f
+    fi
+
+
+%runscript
+    echo "RUNSCRIPT MODE"

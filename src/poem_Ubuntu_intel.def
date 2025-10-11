@@ -3,35 +3,59 @@ From:  ubuntu:24.04
 Stage: build
 
 %post
-    
+ 
+    # Make POEM directory
+    mkdir /POEM_UNI
+    mkdir /POEM_UNI/scripts
+
+    cat <<'EOF' > /POEM_UNI/rc.sh
+#!/bin/bash
+. /spack/share/spack/setup-env.sh
+spack load intel-oneapi-compilers   \
+           intel-oneapi-mpi         \
+           netcdf-c                 \
+           netcdf-fortran           \
+           hdf5%oneapi              \
+           json-c                   \
+           expat                    \
+           udunits
+EOF
+
+
     apt update
-    apt install -y build-essential python3 git gnu-which vim
+    apt install -y build-essential tcsh python3 git gnu-which vim
 
     echo "Installing spack for package management in HPC environment"
     git clone --depth=2 https://github.com/spack/spack.git /spack
+
+    SPACK=/spack/bin/spack
+
+    $SPACK install intel-oneapi-compilers@2023.2.0 %gcc@13.3.0
+    $SPACK install intel-oneapi-mpi                %intel-oneapi-compilers
+    $SPACK install json-c                          %intel-oneapi-compilers
+    $SPACK install expat                           %intel-oneapi-compilers
+    $SPACK install udunits                         %intel-oneapi-compilers
+    $SPACK install hdf5+mpi                        %intel-oneapi-compilers
+    $SPACK install netcdf-c@4.9.2+parallel-netcdf  %intel-oneapi-compilers
+    $SPACK install netcdf-fortran                  %intel-oneapi-compilers
     
-    # Make POEM directory
-    mkdir /POEM_UNI
-    mkdir /POEM_UNI/bashrc.d
-   
+
+
+ 
 %environment
 
     export SPACK_ROOT=/spack
     export POEM_UNI=/POEM_UNI
     export POEM=${POEM_UNI}/poem
     export LC_ALL=C
-    export SPACKENV="$SPACK_ROOT/share/spack/setup-env.sh"
+    export PATH=${SPACK_ROOT}/bin:${PATH}
 
-    if [ -d ${POEM_UNI}/bashrc.d ]; then
-        for f in ${POEM_UNI}/bashrc.d/*.sh; do
-            if [ -r $f ]; then
-                echo "Sourcing file: $f"
-                source $f
-            fi
-        done
-        unset f
-    fi
+    loadpoem() {
+        . ${POEM_UNI}/rc.sh
+    }
 
 
 %runscript
-    echo "RUNSCRIPT MODE"
+
+    . ${POEM_UNI}/rc.sh
+    echo "POEM=$POEM"

@@ -3,8 +3,16 @@
 script_dir=$(dirname $0)
 output_root=$1
 label=$2
+suffix=$3
 
-sandbox_path=$output_root/SANDBOX_${label}/
+
+if [ -n "$suffix" ] ; then
+    label_suffix=${label}_${suffix}
+else
+    label_suffix=${label}
+fi
+
+sandbox_path=$output_root/SANDBOX_${label_suffix}/
 def_file=$script_dir/$label.def
 
 echo "Def file        : $def_file"

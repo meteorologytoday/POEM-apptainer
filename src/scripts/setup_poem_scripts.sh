@@ -12,6 +12,13 @@ if [ ! -d "$TARGET_ROOT" ]; then
 fi
 
 
+echo "Path received: $TARGET_ROOT"
+
+if [[ ! "$TARGET_ROOT" =~ ^/ ]]; then
+    echo "Error: The given path must be an abosolute path."
+    exit 1
+fi
+
 
 
 
@@ -25,13 +32,12 @@ git checkout $POEM_version
 cd src/land_atlantes
 git clone https://gitlab.pik-potsdam.de/lpjml/central_code_variants/lpjml_poem.git LPJmL
 cd LPJmL
-checkout $LPJmL_version
+git checkout $LPJmL_version
 
 
 # Make standalone LPJmL
 cd $TARGET_ROOT
 git clone https://gitlab.pik-potsdam.de/lpjml/central_code_variants/lpjml_poem.git standalone_LPJmL
 cd standalone_LPJmL
-checkout $LPJmL_version
-
+git checkout $LPJmL_version
 
